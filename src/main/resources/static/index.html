@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spotify Artist Discovery</title>
+    <style>
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            background-color: #121212; 
+            color: white; 
+            padding: 40px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 { color: #1DB954; font-size: 2.5rem; margin-bottom: 30px; }
+        .container { width: 100%; max-width: 800px; background: #181818; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: #b3b3b3; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; padding-bottom: 10px; border-bottom: 1px solid #282828; }
+        td { padding: 15px 0; border-bottom: 1px solid #282828; font-size: 1rem; }
+        .score { color: #1DB954; font-weight: bold; }
+        .listeners { color: #b3b3b3; }
+        tr:hover { background-color: #282828; cursor: default; }
+    </style>
+</head>
+<body>
+    <h1>💎 Hidden Gem Discovery</h1>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Artist Name</th>
+                    <th>Influence Score</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="artist-list">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchGems() {
+            const response = await fetch('/api/artists/gems');
+            const artists = await response.json();
+            const list = document.getElementById('artist-list');
+            
+            artists.forEach(artist => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${artist.name}</strong></td>
+                    <td class="score">${artist.score.toFixed(6)}</td>
+                    <td class="listeners">${artist.listeners === 0 ? 'Legendary / Under-crawled' : artist.listeners.toLocaleString() + ' Listeners'}</td>
+                `;
+                list.appendChild(row);
+            });
+        }
+        fetchGems();
+    </script>
+</body>
+</html>
