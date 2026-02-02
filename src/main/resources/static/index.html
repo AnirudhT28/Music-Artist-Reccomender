@@ -2,60 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spotify Artist Discovery</title>
+    <title>Spotify Hidden Gems</title>
     <style>
-        body { 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            background-color: #121212; 
-            color: white; 
-            padding: 40px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 { color: #1DB954; font-size: 2.5rem; margin-bottom: 30px; }
-        .container { width: 100%; max-width: 800px; background: #181818; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; color: #b3b3b3; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; padding-bottom: 10px; border-bottom: 1px solid #282828; }
-        td { padding: 15px 0; border-bottom: 1px solid #282828; font-size: 1rem; }
+        body { font-family: 'Inter', sans-serif; background: #121212; color: white; padding: 40px; }
+        .controls { margin-bottom: 30px; text-align: center; }
+        input { padding: 12px; width: 300px; border-radius: 20px; border: none; outline: none; }
+        button { padding: 12px 20px; border-radius: 20px; background: #1DB954; color: black; border: none; font-weight: bold; cursor: pointer; }
+        table { width: 100%; max-width: 800px; margin: 0 auto; border-collapse: collapse; background: #181818; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #282828; }
+        th { color: #b3b3b3; font-size: 0.8rem; }
         .score { color: #1DB954; font-weight: bold; }
-        .listeners { color: #b3b3b3; }
-        tr:hover { background-color: #282828; cursor: default; }
     </style>
 </head>
 <body>
-    <h1>💎 Hidden Gem Discovery</h1>
-    <div class="container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Artist Name</th>
-                    <th>Influence Score</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="artist-list">
-                </tbody>
-        </table>
+
+    <div class="controls">
+        <h1>💎 Hidden Gem Discovery</h1>
+        <input list="artist-options" id="artist-input" placeholder="Type an artist you like...">
+        <datalist id="artist-options"></datalist>
+        <button onclick="loadGems()">Discover</button>
     </div>
 
+    <table>
+        <thead>
+            <tr><th>Artist</th><th>Influence Score</th><th>Listeners</th></tr>
+        </thead>
+        <tbody id="artist-table"></tbody>
+    </table>
+
     <script>
-        async function fetchGems() {
-            const response = await fetch('/api/artists/gems');
-            const artists = await response.json();
-            const list = document.getElementById('artist-list');
-            
-            artists.forEach(artist => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${artist.name}</strong></td>
-                    <td class="score">${artist.score.toFixed(6)}</td>
-                    <td class="listeners">${artist.listeners === 0 ? 'Legendary / Under-crawled' : artist.listeners.toLocaleString() + ' Listeners'}</td>
-                `;
-                list.appendChild(row);
+        // 1. Populate search bar with valid names only
+        async function loadSearch() {
+            const res = await fetch('/api/artists/names');
+            const names = await res.json();
+            const list = document.getElementById('artist-options');
+            names.forEach(n => {
+                let opt = document.createElement('option');
+                opt.value = n;
+                list.appendChild(opt);
             });
         }
-        fetchGems();
+
+        // 2. Fetch and render data
+        async function loadGems() {
+            const seed = document.getElementById('artist-input').value;
+            const url = seed ? `/api/artists/gems?seed=${encodeURIComponent(seed)}` : '/api/artists/gems';
+            
+            const res = await fetch(url);
+            const artists = await res.json();
+            const tbody = document.getElementById('artist-table');
+            
+            tbody.innerHTML = artists.length ? '' : '<tr><td colspan="3">No neighbors found in the graph. Try another artist!</td></tr>';
+            
+            artists.forEach(a => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${a.name}</strong></td>
+                        <td class="score">${a.score.toFixed(6)}</td>
+                        <td>${a.listeners.toLocaleString()}</td>
+                    </tr>`;
+            });
+        }
+
+        loadSearch();
+        loadGems(); // Initial load for global gems
     </script>
 </body>
 </html>
