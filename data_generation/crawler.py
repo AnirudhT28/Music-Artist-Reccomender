@@ -95,4 +95,4 @@ if __name__ == "__main__":
         "Dolly Parton",
         "Sabrina Carpenter"        
     ]
-    build_and_save_graph(seeds, depth=3, max_neighbors=25)
+    build_and_save_graph(seeds, depth=2, max_neighbors=30)
