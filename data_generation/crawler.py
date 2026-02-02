@@ -92,7 +92,7 @@ if __name__ == "__main__":
         "Fela Kuti",         
         "Björk",              
         "Bad Bunny",          
-        "Dolly Parton"
+        "Dolly Parton",
         "Sabrina Carpenter"        
     ]
     build_and_save_graph(seeds, depth=3, max_neighbors=25)
