@@ -1,38 +1,20 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
+# --- Java / Maven ---
 target/
 *.class
+.mvn/wrapper/maven-wrapper.jar
+
+# --- Python ---
 .venv/
+__pycache__/
+*.py[cod]
+.env
+
+# --- Databases ---
+*.db-shm
+*.db-wal
+
+# --- IDEs & System ---
+.vscode/
 .DS_Store
-*.db
+Thumbs.db
+HELP.md
