@@ -2,39 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spotify Hidden Gems</title>
+    <title>Spotify Hidden Gems | Discovery Engine</title>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #121212; color: white; padding: 40px; }
-        .controls { margin-bottom: 30px; text-align: center; }
-        input { padding: 12px; width: 300px; border-radius: 20px; border: none; outline: none; }
-        button { padding: 12px 20px; border-radius: 20px; background: #1DB954; color: black; border: none; font-weight: bold; cursor: pointer; }
-        table { width: 100%; max-width: 800px; margin: 0 auto; border-collapse: collapse; background: #181818; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #282828; }
-        th { color: #b3b3b3; font-size: 0.8rem; }
-        .score { color: #1DB954; font-weight: bold; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: #121212; 
+            color: white; 
+            padding: 40px; 
+            line-height: 1.6;
+        }
+        .controls { 
+            margin-bottom: 40px; 
+            text-align: center; 
+            background: linear-gradient(180deg, #1db95422 0%, #121212 100%);
+            padding: 40px;
+            border-radius: 20px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .subtitle { color: #b3b3b3; margin-bottom: 25px; font-size: 1.1rem; }
+        
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        input { 
+            padding: 14px 25px; 
+            width: 350px; 
+            border-radius: 30px; 
+            border: 1px solid #333; 
+            background: #282828;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.3s;
+        }
+        input:focus { border-color: #1DB954; }
+        
+        button { 
+            padding: 14px 30px; 
+            border-radius: 30px; 
+            background: #1DB954; 
+            color: black; 
+            border: none; 
+            font-weight: bold; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: transform 0.2s, background 0.2s;
+        }
+        button:hover { 
+            transform: scale(1.05);
+            background: #1ed760;
+        }
+
+        table { 
+            width: 100%; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            border-collapse: collapse; 
+            background: #181818; 
+            border-radius: 12px; 
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        th, td { padding: 18px; text-align: left; border-bottom: 1px solid #282828; }
+        th { color: #b3b3b3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .artist-name { font-size: 1.1rem; font-weight: 600; color: #fff; }
+        .match-container { display: flex; align-items: center; gap: 10px; }
+        .match-bar-bg { background: #333; width: 100px; height: 8px; border-radius: 4px; overflow: hidden; }
+        .match-bar-fill { background: #1DB954; height: 100%; border-radius: 4px; }
+        .match-text { color: #1DB954; font-weight: bold; font-family: monospace; font-size: 1rem; }
+        
+        tr:hover { background: #2a2a2a; }
+        .no-results { text-align: center; padding: 40px; color: #b3b3b3; }
     </style>
 </head>
 <body>
 
     <div class="controls">
         <h1>💎 Hidden Gem Discovery</h1>
-        <input list="artist-options" id="artist-input" placeholder="Type an artist you like...">
-        <datalist id="artist-options"></datalist>
-        <button onclick="loadGems()">Discover</button>
+        <p class="subtitle" id="graph-stats">Analyzing graph influence...</p>
+        <div class="search-box">
+            <input list="artist-options" id="artist-input" placeholder="Enter a seed artist (e.g. Radiohead)">
+            <datalist id="artist-options"></datalist>
+            <button onclick="loadGems()">Discover</button>
+        </div>
     </div>
 
     <table>
         <thead>
-            <tr><th>Artist</th><th>Influence Score</th><th>Listeners</th></tr>
+            <tr>
+                <th>Recommended Artist</th>
+                <th>Compatibility Index</th>
+            </tr>
         </thead>
-        <tbody id="artist-table"></tbody>
+        <tbody id="artist-table">
+            </tbody>
     </table>
 
     <script>
-        // 1. Populate search bar with valid names only
-        async function loadSearch() {
+        // Initialize search data and stats
+        async function init() {
             const res = await fetch('/api/artists/names');
             const names = await res.json();
+            
+            // Update stats
+            document.getElementById('graph-stats').innerText = 
+                `Exploring ${names.length.toLocaleString()} artists across 17,516 influence connections`;
+
+            // Fill datalist
             const list = document.getElementById('artist-options');
             names.forEach(n => {
                 let opt = document.createElement('option');
@@ -43,29 +120,52 @@
             });
         }
 
-        // 2. Fetch and render data
+        //Main Discovery Logic
         async function loadGems() {
             const seed = document.getElementById('artist-input').value;
             const url = seed ? `/api/artists/gems?seed=${encodeURIComponent(seed)}` : '/api/artists/gems';
             
-            const res = await fetch(url);
-            const artists = await res.json();
-            const tbody = document.getElementById('artist-table');
-            
-            tbody.innerHTML = artists.length ? '' : '<tr><td colspan="3">No neighbors found in the graph. Try another artist!</td></tr>';
-            
-            artists.forEach(a => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${a.name}</strong></td>
-                        <td class="score">${a.score.toFixed(6)}</td>
-                        <td>${a.listeners.toLocaleString()}</td>
-                    </tr>`;
-            });
+            try {
+                const res = await fetch(url);
+                const artists = await res.json();
+                const tbody = document.getElementById('artist-table');
+                
+                if (artists.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2" class="no-results">
+                        No neighbors found for "${seed}".<br>
+                        <small>Try a more connected artist from the dropdown!</small>
+                    </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                
+                artists.forEach(a => {
+                    // Normalize the PageRank score to a 0-100 compatibility scale
+                    // Using a multiplier based on your 3k node graph density
+                    const matchPercent = Math.min(99.9, (a.score * 25000)).toFixed(1);
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="artist-name">${a.name}</td>
+                            <td>
+                                <div class="match-container">
+                                    <div class="match-bar-bg">
+                                        <div class="match-bar-fill" style="width: ${matchPercent}%"></div>
+                                    </div>
+                                    <span class="match-text">${matchPercent}%</span>
+                                </div>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) {
+                console.error("Discovery error:", err);
+            }
         }
 
-        loadSearch();
-        loadGems(); // Initial load for global gems
+        // Run on load
+        init();
+        loadGems(); // Initial global recommendations
     </script>
 </body>
 </html>
