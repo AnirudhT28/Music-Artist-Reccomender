@@ -17,11 +17,14 @@ public interface ArtistRepository extends JpaRepository<Artist, String> {
     List<String> findAllArtistNames();
 
     
-    // PERSONALIZED QUERY: Finds neighbors of the seed artist 
+
+     //TWO-STEP DISCOVERY: Finds artists influenced by the same people 
      
-    @Query(value = "SELECT a.* FROM artists a " +
-                   "JOIN influences i ON a.name = i.influenced_name " +
-                   "WHERE i.artist_name = :seedName " +
-                   "ORDER BY a.score / (1.0 + a.listeners) DESC LIMIT 10", nativeQuery = true)
-    List<Artist> findGemsBySeed(@Param("seedName") String seedName);
+@Query(value = "SELECT DISTINCT a.* FROM artists a " +
+"JOIN influences i1 ON a.name = i1.influenced_name " +
+"JOIN influences i2 ON i1.artist_name = i2.influenced_name " +
+"WHERE i2.artist_name = :seedName " +
+"AND a.name != :seedName " + // Don't recommend the seed itself
+"ORDER BY a.score / (1.0 + a.listeners) DESC LIMIT 10", nativeQuery = true)
+List<Artist> findGemsBySeed(@Param("seedName") String seedName);
 }
