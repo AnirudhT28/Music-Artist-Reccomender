@@ -82,6 +82,17 @@ def build_and_save_graph(seed_artists, depth=2, max_neighbors=15):
         print(f"Saved {len(artist_data)} artists and {len(edge_data)} connections.")
 
 if __name__ == "__main__":
-    # Expanded seed list to create more "interconnected" clusters
-    seeds = ["Radiohead", "Daft Punk", "Tame Impala", "Justice", "Nirvana", "Aphex Twin"]
-    build_and_save_graph(seeds, depth=2)
+    seeds = [
+        "Radiohead",          
+        "Kaytranada",         
+        "Miles Davis",        
+        "MF DOOM",            
+        "Aphex Twin",         
+        "Cocteau Twins",     
+        "Fela Kuti",         
+        "Björk",              
+        "Bad Bunny",          
+        "Dolly Parton"
+        "Sabrina Carpenter"        
+    ]
+    build_and_save_graph(seeds, depth=3, max_neighbors=25)
