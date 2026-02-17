@@ -8,8 +8,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "..", "artist_graph.db")
 
-API_KEY = "48ce68fed763d353780ba4d180ebf94e"
-API_SECRET = "4e7a09835335854f3cd32188c18848a6"
+API_KEY = ""
+API_SECRET = ""
 
 def build_and_save_graph(seed_artists, depth=2, max_neighbors=15): 
     network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET)
