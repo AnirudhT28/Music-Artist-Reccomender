@@ -1,3 +1,5 @@
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://music-artist-reccomender.onrender.com/)
+
 # Artist Recommender System-
 An artist recommendation system that takes in an input of an artist and returns the 10 most similar artists that you may not have known beforehand
 
@@ -17,6 +19,4 @@ Data/Python: NetworkX, SciPy, PyLast (Last.fm API), PageRank Algorithm
 
 Infrastructure: RESTful APIs, Environment Variables (.env), Git
 
-# Try it out!
 
-https://music-artist-reccomender.onrender.com
