@@ -17,8 +17,6 @@ Data/Python: NetworkX, SciPy, PyLast (Last.fm API), PageRank Algorithm
 
 Infrastructure: RESTful APIs, Environment Variables (.env), Git
 
-# How to run
+# Try it out!
 
-1)Launch: Run mvn spring-boot:run from the root directory.
-
-2) Discover: Open http://localhost:8080 and enter a seed artist to explore similar artists.
+https://music-artist-reccomender.onrender.com
