@@ -1,3 +1,10 @@
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://music-artist-reccomender.onrender.com/)
+Note on Performance: This application is hosted on a Render Free Instance. If the site hasn't been visited recently, the container may be asleep.
+
+Please allow 30–60 seconds for the initial spin-up.
+Once active, the Java backend will be fully responsive as it navigates the pre-loaded SQLite graph.
+
+
 # Artist Recommender System-
 An artist recommendation system that takes in an input of an artist and returns the 10 most similar artists that you may not have known beforehand
 
@@ -17,8 +24,4 @@ Data/Python: NetworkX, SciPy, PyLast (Last.fm API), PageRank Algorithm
 
 Infrastructure: RESTful APIs, Environment Variables (.env), Git
 
-# How to run
 
-1)Launch: Run mvn spring-boot:run from the root directory.
-
-2) Discover: Open http://localhost:8080 and enter a seed artist to explore similar artists.
